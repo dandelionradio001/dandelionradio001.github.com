@@ -1,0 +1,176 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>autoresizingMask - Asian Jiang's Blog</title>
+	<meta name="author" content="Jiang Yazhou">
+
+	
+	<meta name="description" content="autoresizingMask 在 UIView 中有一个autoresizingMask的属性，它对应的是一个枚举的值（如下），属性的意思就是自动调整子控件与父控件中间的位置，宽高。 enum { UIViewAutoresizingNone = 0, &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Asian Jiang's Blog" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://jiangyazhou.github.com/blog/2014/03/25/autoresizingmask/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img src='http://www.gravatar.com/avatar/" + MD5("359675594@qq.com") + "?s=160' alt='Profile Picture' style='width: 160px;' />");
+	</script>
+</div>
+<h1><a href="/">Asian Jiang's Blog</a></h1>
+<p class="subtitle">iOS & Android Dev.</p>
+<nav id="main-nav"><ul class="main">
+    <li><a href="/">Blog</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/jiangyazhou" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="https://github.com/jiangyazhou" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">autoresizingMask</h1>
+	<div class="entry-content" itemprop="articleBody"><p> 在 UIView 中有一个autoresizingMask的属性，它对应的是一个枚举的值（如下），属性的意思就是自动调整子控件与父控件中间的位置，宽高。</p>
+
+<pre><code>enum {
+   UIViewAutoresizingNone                 = 0,
+   UIViewAutoresizingFlexibleLeftMargin   = 1 &lt;&lt; 0,
+   UIViewAutoresizingFlexibleWidth        = 1 &lt;&lt; 1,
+   UIViewAutoresizingFlexibleRightMargin  = 1 &lt;&lt; 2,
+   UIViewAutoresizingFlexibleTopMargin    = 1 &lt;&lt; 3,
+   UIViewAutoresizingFlexibleHeight       = 1 &lt;&lt; 4,
+   UIViewAutoresizingFlexibleBottomMargin = 1 &lt;&lt; 5
+};
+</code></pre>
+
+<ul>
+<li>UIViewAutoresizingNone就是不自动调整。</li>
+<li>UIViewAutoresizingFlexibleLeftMargin
+自动调整与superView左边的距离，保证与superView右边的距离不变。</li>
+<li>UIViewAutoresizingFlexibleRightMargin
+自动调整与superView的右边距离，保证与superView左边的距离不变。</li>
+<li>UIViewAutoresizingFlexibleTopMargin
+自动调整与superView顶部的距离，保证与superView底部的距离不变。</li>
+<li>UIViewAutoresizingFlexibleBottomMargin
+自动调整与superView底部的距离，也就是说，与superView顶部的距离不变。</li>
+<li>UIViewAutoresizingFlexibleWidth 自动调整自己的宽度，保证与superView左边和右边的距离不变。</li>
+<li>UIViewAutoresizingFlexibleHeight 自动调整自己的高度，保证与superView顶部和底部的距离不变。</li>
+<li>UIViewAutoresizingFlexibleLeftMargin |UIViewAutoresizingFlexibleRightMargin
+自动调整与superView左边的距离，保证与左边的距离和右边的距离和原来距左边和右边的距离的比例不变。比如原来距离为20，30，调整后的距离应为68，102，即68/20=102/30。其它的组合类似。</li>
+</ul>
+
+
+<p>例子：</p>
+
+<pre><code> - (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+
+    UIView *view1 = [[UIView alloc] initWithFrame:CGRectMake(10.0f, 40.0f, 200.0f, 200.0f)];
+    view1.backgroundColor = [UIColor greenColor];
+
+    UIView *subView1 = [[UIView alloc] initWithFrame:CGRectMake(20.0f, 10.0f, 150.0f, 100.0f)];
+    subView1.backgroundColor = [UIColor redColor];
+    subView1.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+
+    [view1 addSubview:subView1];
+    [self.view addSubview:view1];
+
+    view1.frame = CGRectMake(10.0f, 40.0f, 320.0f, 200.0f);
+    NSLog(@"subView1.frame:%@", NSStringFromCGRect(subView1.frame));
+}
+</code></pre>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner">Copyright &copy; 2014
+
+    Jiang Yazhou
+
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

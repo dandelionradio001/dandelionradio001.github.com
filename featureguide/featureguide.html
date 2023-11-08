@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>如何使用？</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <script src="js/vue.min.js"></script>
+    <style type="text/css">
+    * {
+        -webkit-touch-callout: none;
+        /*系统默认菜单被禁用*/
+        -webkit-user-select: none;
+        /*webkit浏览器*/
+        -khtml-user-select: none;
+        /*早期浏览器*/
+        -moz-user-select: none;
+        /*火狐*/
+        -ms-user-select: none;
+        /*IE10*/
+        user-select: none;
+    }
+    
+    body {
+        font-family: '-apple-system', 'HelveticaNeue';
+    }
+    
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #widgetheader {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    
+    #widgettitle {
+        margin-left: 10px
+    }
+    
+    .section-title {
+        font-size: 17px;
+        color: rgb(56, 56, 56);
+    }
+    
+    .section-subtitle {
+        font-size: 12px;
+        color: rgb(128, 128, 128);
+    }
+    
+    #thirddtouchtitle, #applewatchtitle {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .section-cell {
+        position: relative;
+        padding-left: 44px;
+        padding-right: 24px;
+    }
+    
+    .cell-index {
+        line-height: 18px;
+        text-align: center;
+        color: rgb(255, 255, 255);
+        background-color: rgb(19, 142, 234);
+        width: 18px;
+        height: 18px;
+        border-radius: 2px;
+        font-size: 14px;
+        position: absolute;
+        left: 15px;
+    }
+    
+    .cell-title {
+        font-size: 14px;
+        color: rgb(56, 56, 56);
+        vertical-align: center;
+    }
+    
+    .cell-picture {
+        margin-top: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .applewatch_cell_down_picture {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    </style>
+</head>
+
+<body>
+    <div id="widget">
+        <div id="widgetheader">
+            <img src='images/hand1@3x.png' width="29" height="57" />
+            <div id="widgettitle">
+                <div class="section-title">{{title}}</div>
+                <div class="section-subtitle" style="width:100%;text-align: center">{{subtitle}}</div>
+            </div>
+        </div>
+        <ul id="widgetlist">
+            <li v-for="(item, index) in items">
+                <div class="section-cell">
+                    <span class="cell-index">{{index+1}}</span>
+                    <span class="cell-title">
+                        {{item.title}}
+                    </span>
+                </div>
+                <div class="cell-picture">
+                    <img :src="item.image" :width="item.width" :height="item.height" />
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div id="thirddtouch">
+        <div id="thirddtouchheader">
+            <div id="thirddtouchtitle">
+                <img src='images/hand2@3x.png' width="30" height="57" />
+                <div class="section-title" style="margin-left: 10px">{{title}}</div>
+            </div>
+            <div class="section-subtitle" style="text-align: center;margin-bottom: 30px">
+                {{subtitle}}
+            </div>
+        </div>
+        <ul id="thirddtouchlist">
+            <li v-for="(item, index) in items">
+                <div class="section-cell">
+                    <span class="cell-index">{{index+1}}</span>
+                    <span class="cell-title">
+                        {{item.title}}
+                    </span>
+                </div>
+                <div class="cell-picture">
+                    <div>
+                        <img :src="item.image1" :width="item.width1" :height="item.height1" />
+                    </div>
+                    <div style="margin:10px 0px">
+                        <img src="images/3dtouch_slide@3x.png" width="20" height="30" />
+                    </div>
+                    <div>
+                        <img :src="item.image2" :width="item.width2" :height="item.height2" />
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div id="applewatch">
+        <div id="applewatchheader" style="margin-top: 50px">
+            <div id="applewatchtitle" style="margin-bottom: 30px">
+                <img src='images/hand3@3x.png' width="50" height="27" />
+                <div class="section-title" style="margin-left: 10px">{{title}}</div>
+            </div>
+        </div>
+        <ul id="applewatchlist">
+            <li v-for="(item, index) in items">
+                <div class="section-cell">
+                    <span class="cell-index">{{index+1}}</span>
+                    <span class="cell-title" v-html='item.title'>
+                    </span>
+                </div>
+                <div class="cell-picture">
+                    <div>
+                        <img :src="item.image1" :width="item.width1" :height="item.height1" />
+                    </div>
+                    <div v-if="item.seen">
+                        <div style="margin:10px 0px">
+                            <img src="images/3dtouch_slide@3x.png" width="20" height="30" />
+                        </div>
+                        <div class="applewatch_cell_down_picture">
+                            <div>
+                                <img :src="item.image2" :width="item.width2" :height="item.height2" />
+                            </div>
+                            <div v-if="item.seen2" style="margin-left: 25px">
+                                <img :src="item.image3" :width="item.width3" :height="item.height3" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script>
+    new Vue({
+        el: '#widget',
+        data: {
+            title: "如何添加通知栏中心小工具",
+            subtitle: "仅iOS8及以上系统支持",
+            items: [{
+                title: '从iPhone顶端向下滑动拉出通知中心',
+                image: "images/widget1@3x.png",
+                width: "253",
+                height: "193"
+            }, {
+                title: "点击通知中心“编辑”按钮",
+                image: "images/widget2@3x.png",
+                width: "253",
+                height: "405"
+            }, {
+                title: "点击添加航班管家",
+                image: "images/widget3@3x.png",
+                width: "253",
+                height: "298"
+            }, {
+                title: "快速查看航班延误状态",
+                image: "images/widget4@3x.png",
+                width: "253",
+                height: "296"
+            }]
+        }
+    })
+    new Vue({
+        el: '#thirddtouch',
+        data: {
+            title: "如何使用3D Touch？",
+            subtitle: "仅iPhone6S、iPhone6S Plus及以上机型支持",
+            items: [{
+                title: '机票详情页面，舱位用力按下会显示简略订阅信息，按住向上滑动可快速预订或查看航班延误信息',
+                image1: "images/3dtouch1@3x.png",
+                width1: "253",
+                height1: "226",
+                image2: "images/3dtouch2@3x.png",
+                width2: "253",
+                height2: "271"
+            }, {
+                title: "航班动态中，我关注的航班卡片用力按下可显示详细航班信息，按住以上滑动可查看准点率、详情等",
+                image1: "images/3dtouch3@3x.png",
+                width1: "253",
+                height1: "233",
+                image2: "images/3dtouch4@3x.png",
+                width2: "253",
+                height2: "400",
+            }]
+        }
+    })
+    new Vue({
+        el: '#applewatch',
+        data: {
+            title: "如何使用Apple Watch表盘？",
+            items: [{
+                title: "<font color='#138EEA'>用力按下表盘，左右横滑找到“模块”</font>表盘，点击“自定”按钮",
+                image1: "images/applewatch1@3x.png",
+                width1: "118",
+                height1: "147",
+                seen: false,
+                seen2: false,
+            }, {
+                title: "<font color='#138EEA'>左右横滑</font>，切换至表盘元素编辑界面，点击中间模块，<font color='#138EEA'>旋转手表右侧圆形按钮</font>（数码表冠），选择航班管家，当您在航班管家客户端有最近行程时将会在此展示",
+                image1: "images/applewatch2@3x.png",
+                width1: "118",
+                height1: "147",
+                image2: "images/applewatch3@3x.png",
+                width2: "115",
+                height2: "144",
+                image3: "images/applewatch4@3x.png",
+                width3: "115",
+                height3: "144",
+                seen: true,
+                seen2: true,
+            }, {
+                title: "点击其他四个小模块中的任意一个，<font color='#138EEA'>旋转手表右侧圆形按钮</font>（数码表冠），选择航班管家，即可展示航班管家图标，点击即可快速打开航班管家",
+                image1: "images/applewatch5@3x.png",
+                width1: "118",
+                height1: "147",
+                image2: "images/applewatch6@3x.png",
+                width2: "118",
+                height2: "147",
+                seen: true,
+                seen2:false,
+            }]
+        }
+    })
+    </script>
+    <script>
+    </script>
+</body>
+
+</html>

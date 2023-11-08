@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: 
+
+User-agent: Google-adstxt
+Disallow:
+
+Sitemap: http://jiangyazhou.github.com/sitemap.xml 

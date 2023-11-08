@@ -1,0 +1,239 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>关于block多参数的情况 - Asian Jiang's Blog</title>
+	<meta name="author" content="Jiang Yazhou">
+
+	
+	<meta name="description" content="关于block多参数的情况 关于block的原理，唐巧已经在他的blog里面做了很详尽和专业的分析：
+http://blog.devtang.com/blog/2013/07/28/a-look-inside-blocks/ 一言以蔽之：闭包是一个函数（或指向函数的指针）， &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Asian Jiang's Blog" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://jiangyazhou.github.com/blog/2014/03/25/guan-yu-blockduo-can-shu-de-qing-kuang/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img src='http://www.gravatar.com/avatar/" + MD5("359675594@qq.com") + "?s=160' alt='Profile Picture' style='width: 160px;' />");
+	</script>
+</div>
+<h1><a href="/">Asian Jiang's Blog</a></h1>
+<p class="subtitle">iOS & Android Dev.</p>
+<nav id="main-nav"><ul class="main">
+    <li><a href="/">Blog</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/jiangyazhou" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="https://github.com/jiangyazhou" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">关于block多参数的情况</h1>
+	<div class="entry-content" itemprop="articleBody"><p>关于block的原理，唐巧已经在他的blog里面做了很详尽和专业的分析：
+<a href="http://blog.devtang.com/blog/2013/07/28/a-look-inside-blocks/">http://blog.devtang.com/blog/2013/07/28/a-look-inside-blocks/</a> <br/>
+一言以蔽之：<strong><em>闭包是一个函数（或指向函数的指针），再加上该函数执行的外部的上下文变量（有时候也称作自由变量）。block是Objective-C语言对于闭包的实现。</em></strong></p>
+
+<p>我们大多数用block的时候，一般只会用到block带确定个参数的情况，比如：</p>
+
+<pre><code>void (^callback)(int);
+void (^callback)(NSDate *);
+</code></pre>
+
+<p>如果现在要实现block的参数个数不定的情况，该怎么实现呢？记得我们用UIAlertView类的时候，有个初始化方法为：</p>
+
+<pre><code>- (id)initWithTitle:(NSString *)title message:(NSString *)message delegate:(id)delegate cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSString *)otherButtonTitles, ...
+</code></pre>
+
+<p>注意到没有，otherButtonTitles后面的3个省略号。对了，这就是C语言实现参数不定的方法。我们把它移植到block中来，比如：</p>
+
+<pre><code>void (^callback)(NSDate *, ...)
+</code></pre>
+
+<p>问题又来了，怎么获得NSDate后面的参数呢。C语言提供了var_start,var_end,var_arg 3个宏可以用来获取NSDate后面的参数。关于var_start,var_end,var_arg的详细信息，可以参考：<a href="http://www.cnblogs.com/hanyonglu/archive/2011/05/07/2039916.html">http://www.cnblogs.com/hanyonglu/archive/2011/05/07/2039916.html</a>    <br/>
+有一点需要注意，<strong><em>函数参数是以数据结构栈的形式存取,从右至左入栈。参数存放在内存的栈中，在执行函数的时候，从最后一个开始入栈。因此栈底高地址，栈顶低地址，</em></strong>。</p>
+
+<p>比如我们有一个类TestView，在点击这个类的时候，触发一个block：</p>
+
+<p><strong>TestView.h</strong></p>
+
+<pre><code>typedef void(^CallbackBlock)(NSObject *object, ...);
+
+@interface TestView : UIView
+
+@property (nonatomic, copy) CallbackBlock callbackBlock;
+
+@end
+</code></pre>
+
+<p><strong>TestView.m</strong></p>
+
+<pre><code>#import "TestView.h"
+
+@implementation TestView
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+
+    }
+
+    return self;
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if(_callbackBlock) {
+        _callbackBlock(@"1", @"2", [NSDate date], [NSArray arrayWithObjects:@"1", nil], nil);
+    }
+}
+@end
+</code></pre>
+
+<p><strong>注意，参数列表的末尾一定要以nil结束，否则会报野指针的异常。</strong></p>
+
+<p><strong>ViewController.h</strong></p>
+
+<pre><code>#import &lt;UIKit/UIKit.h&gt;
+
+#import "TestView.h"
+
+@interface ViewController : UIViewController
+
+@end
+</code></pre>
+
+<p><strong>ViewController.m</strong></p>
+
+<pre><code>#import "ViewController.h"
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+
+    TestView *testView = [[TestView alloc] initWithFrame:CGRectMake(10, 100, 300, 100)];
+    testView.backgroundColor = [UIColor orangeColor];
+    [self.view addSubview:testView];
+    testView.callbackBlock = ^(NSObject *obj1, ...) {
+
+        va_list ap;
+        NSString *str_ = nil;
+
+        va_start(ap, obj1);
+        str_ = va_arg(ap, id);
+
+        while(str_ != nil) {
+            NSLog(@"str_:%@", str_);
+            str_ = va_arg(ap, NSString *);
+        }
+        va_end(ap);
+    };
+}
+</code></pre>
+
+<p>以后在工程中，只用定义一个block就可以了：</p>
+
+<pre><code>typedef void(^CallbackBlock)(NSObject *object, ...);
+</code></pre>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner">Copyright &copy; 2014
+
+    Jiang Yazhou
+
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>
